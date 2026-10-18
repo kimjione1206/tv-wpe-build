@@ -1,0 +1,4 @@
+# webOS 조립 설명서(webos_tv_defconfig)에 덧붙이는 것: 최신 웹 엔진 WPE + 브라우저 껍데기 cog
+BR2_PACKAGE_WPEWEBKIT=y
+BR2_PACKAGE_COG=y
+BR2_PACKAGE_COG_PLATFORM_FDO=y

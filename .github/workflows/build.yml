@@ -1,0 +1,103 @@
+name: WPE 빌드
+
+on:
+  workflow_dispatch:
+
+env:
+  FORCE_UNSAFE_CONFIGURE: 1
+  # webOS 조립 설명서(openlgtv/buildroot-nc4) — 바뀌지 않게 커밋을 고정
+  BUILDROOT_REPO: openlgtv/buildroot-nc4
+  BUILDROOT_REF: 322ff04e625a7927338c2ac5f3d02cd0511c9b90
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 355
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 빈 공간 만들기 (엔진 빌드는 디스크를 많이 씀)
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL /usr/local/share/boost
+          df -h /
+
+      - name: 준비물 설치
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y build-essential cpio rsync bc libssl-dev unzip file wget python3 ruby gperf
+
+      - name: webOS 조립 설명서 받기
+        run: |
+          git clone --filter=blob:none https://github.com/${BUILDROOT_REPO}.git buildroot
+          git -C buildroot checkout ${BUILDROOT_REF}
+
+      - name: 받은 부품 캐시
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ runner.temp }}/dl
+          key: dl-${{ github.run_id }}
+          restore-keys: dl-
+
+      - name: 컴파일 캐시
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ runner.temp }}/ccache
+          key: ccache-${{ github.run_id }}
+          restore-keys: ccache-
+
+      - name: 설정 (webOS + WPE)
+        working-directory: buildroot
+        run: |
+          make webos_tv_defconfig
+          cat ../wpe.fragment >> .config
+          echo 'BR2_CCACHE=y' >> .config
+          echo "BR2_CCACHE_DIR=\"${RUNNER_TEMP}/ccache\"" >> .config
+          echo "BR2_DL_DIR=\"${RUNNER_TEMP}/dl\"" >> .config
+          make olddefconfig
+          grep -E '^BR2_PACKAGE_(WPEWEBKIT|COG|WPEBACKEND_FDO|LIBWPE)' .config
+
+      - name: 빌드
+        working-directory: buildroot
+        # 깃허브 한도(6시간) 전에 끊어야 아래 캐시 저장이 돌아서 다음 실행이 이어짐
+        timeout-minutes: 300
+        run: make 2>&1 | tee ../build.log | grep -E '^>>>' ; exit ${PIPESTATUS[0]}
+
+      - name: 결과물 묶기
+        if: success()
+        working-directory: buildroot/output/target
+        run: |
+          tar czf ../../../wpe-target.tar.gz usr/bin/cog* usr/lib usr/libexec usr/share/wpe* usr/share/fonts 2>/dev/null || tar czf ../../../wpe-target.tar.gz usr/bin usr/lib usr/libexec
+          ls -lh ../../../wpe-target.tar.gz
+          du -sh usr/lib usr/libexec || true
+
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: wpe-target
+          path: wpe-target.tar.gz
+          retention-days: 7
+
+      - name: 빌드 기록 마지막 부분
+        if: always()
+        run: tail -n 200 build.log || true
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: build-log
+          path: build.log
+          retention-days: 7
+
+      - name: 받은 부품 캐시 저장
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ runner.temp }}/dl
+          key: dl-${{ github.run_id }}
+
+      - name: 컴파일 캐시 저장 (시간 초과로 끊겨도 다음에 이어서 빨라지게)
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ runner.temp }}/ccache
+          key: ccache-${{ github.run_id }}
