@@ -61,7 +61,7 @@ jobs:
           # webOS 에 맞춰 고친 수정 파일들 (patches/<꾸러미 이름>/)
           echo "BR2_GLOBAL_PATCH_DIR=\"${GITHUB_WORKSPACE}/patches\"" >> .config
           make olddefconfig
-          grep -E '^BR2_PACKAGE_(WPEWEBKIT|COG|WPEBACKEND_FDO|LIBWPE)' .config
+          grep -E 'BR2_PACKAGE_(WPEWEBKIT|COG|WPEBACKEND_FDO|LIBWPE)' .config
 
       - name: 빌드
         working-directory: buildroot

@@ -4,3 +4,5 @@ BR2_PACKAGE_COG=y
 # cog 의 Wayland 화면 방식은 최신 xdg-shell 규격이 필요한데, webOS 는 TV 화면 관리자에 맞춘
 # 2017년 판 wayland-protocols(1.11)라 맞지 않음 → cog 는 화면 없는(headless) 방식만 쓰고,
 # 화면은 SDL(0단계에서 검증)로 따로 연결한다
+# 기본값이 "켬"이라 직접 꺼야 함
+# BR2_PACKAGE_COG_PLATFORM_FDO is not set
