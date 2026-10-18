@@ -1,0 +1,29 @@
+webOS TV 의 오래된 glibc 에 memfd_create 가 없어서 직접 채움
+
+--- a/src/ws-egl.cpp
++++ b/src/ws-egl.cpp
+@@ -34,6 +34,24 @@
+ #include <sys/mman.h>
+ #include <sys/stat.h>
+ #include <unistd.h>
++#include <sys/syscall.h>
++
++// webOS TV 의 오래된 C 라이브러리(glibc)·커널 헤더에는 memfd_create 가 없어서 직접 채운다 (TV 커널 4.4 는 기능 자체는 있음)
++#ifndef MFD_CLOEXEC
++#define MFD_CLOEXEC 0x0001U
++#define MFD_ALLOW_SEALING 0x0002U
++#ifndef __NR_memfd_create
++#define __NR_memfd_create 385
++#endif
++static inline int memfd_create(const char* name, unsigned int flags)
++{
++    return syscall(__NR_memfd_create, name, flags);
++}
++#endif
++#ifndef F_ADD_SEALS
++#define F_ADD_SEALS (1024 + 9)
++#define F_SEAL_SHRINK 0x0002
++#endif
+ 
+ #ifndef EGL_WL_bind_wayland_display
+ #define EGL_WAYLAND_BUFFER_WL 0x31D5

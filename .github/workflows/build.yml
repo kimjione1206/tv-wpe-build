@@ -53,6 +53,8 @@ jobs:
           echo 'BR2_CCACHE=y' >> .config
           echo "BR2_CCACHE_DIR=\"${RUNNER_TEMP}/ccache\"" >> .config
           echo "BR2_DL_DIR=\"${RUNNER_TEMP}/dl\"" >> .config
+          # webOS 에 맞춰 고친 수정 파일들 (patches/<꾸러미 이름>/)
+          echo "BR2_GLOBAL_PATCH_DIR=\"${GITHUB_WORKSPACE}/patches\"" >> .config
           make olddefconfig
           grep -E '^BR2_PACKAGE_(WPEWEBKIT|COG|WPEBACKEND_FDO|LIBWPE)' .config
 
