@@ -1,0 +1,14 @@
+webOS TV 의 옛 glibc 에 roundeven 이 없어서 기존 대체 코드를 쓰게 함
+
+--- a/Source/JavaScriptCore/runtime/MathCommon.cpp
++++ b/Source/JavaScriptCore/runtime/MathCommon.cpp
+@@ -604,7 +604,8 @@
+     return std::nearbyint(operand);
+ }
+ 
+-#if (OS(LINUX) && !defined(__GLIBC__)) || OS(HAIKU)
++// webOS TV 의 glibc 는 roundeven(2.25 부터)이 없어서 아래 대체 코드를 쓴다
++#if (OS(LINUX) && !defined(__GLIBC__)) || OS(HAIKU) || (defined(__GLIBC__) && !__GLIBC_PREREQ(2, 25))
+ static inline float roundevenf(float operand)
+ {
+     float rounded = roundf(operand);

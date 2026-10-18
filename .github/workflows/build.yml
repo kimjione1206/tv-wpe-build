@@ -31,7 +31,7 @@ jobs:
           git clone --filter=blob:none https://github.com/${BUILDROOT_REPO}.git buildroot
           git -C buildroot checkout ${BUILDROOT_REF}
           # 엔진 본체는 오류가 나도 끝까지 조립해서, 고칠 곳을 한 번에 모은다
-          echo 'WPEWEBKIT_MAKE_OPTS += -k 0' >> buildroot/package/wpewebkit/wpewebkit.mk
+          echo 'WPEWEBKIT_BUILD_OPTS = -- -k 0' >> buildroot/package/wpewebkit/wpewebkit.mk
           # webOS 조립은 ARM 모드라 기본 JIT 가 꺼짐 → 상위 JIT 와 충돌 ("DFG and FTL JIT require baseline JIT")
           # buildroot 가 ARMv5/6 에 쓰는 방식 그대로 해석기(CLoop)로 돌린다
           echo 'WPEWEBKIT_CONF_OPTS += -DENABLE_JIT=OFF -DENABLE_DFG_JIT=OFF -DENABLE_FTL_JIT=OFF -DENABLE_C_LOOP=ON -DENABLE_SAMPLING_PROFILER=OFF -DENABLE_WEBASSEMBLY=OFF' >> buildroot/package/wpewebkit/wpewebkit.mk
