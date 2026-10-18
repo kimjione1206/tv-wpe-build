@@ -2,3 +2,5 @@
 BR2_PACKAGE_WPEWEBKIT=y
 BR2_PACKAGE_COG=y
 BR2_PACKAGE_COG_PLATFORM_FDO=y
+# cog 의 Wayland 화면 쪽이 cairo 를 씀 (엔진은 Skia 를 써서 cairo 가 자동으로 안 들어옴)
+BR2_PACKAGE_CAIRO=y
