@@ -1,0 +1,19 @@
+webOS TV 의 오래된 glibc 헤더에 없는 MADV_DONTDUMP/MADV_DODUMP 채움
+
+--- a/Source/bmalloc/bmalloc/VMAllocate.h
++++ b/Source/bmalloc/bmalloc/VMAllocate.h
+@@ -40,7 +40,14 @@
+ #else
+ #include <sys/mman.h>
+ #include <unistd.h>
++// webOS TV 의 오래된 glibc 헤더에 없는 값 (리눅스 3.4 부터 있는 기능, TV 커널 4.4 는 지원)
++#ifndef MADV_DONTDUMP
++#define MADV_DONTDUMP 16
+ #endif
++#ifndef MADV_DODUMP
++#define MADV_DODUMP 17
++#endif
++#endif
+ 
+ #if BOS(DARWIN)
+ #include <mach/vm_page_size.h>

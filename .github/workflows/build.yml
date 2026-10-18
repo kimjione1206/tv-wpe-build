@@ -30,6 +30,8 @@ jobs:
         run: |
           git clone --filter=blob:none https://github.com/${BUILDROOT_REPO}.git buildroot
           git -C buildroot checkout ${BUILDROOT_REF}
+          # 엔진 본체는 오류가 나도 끝까지 조립해서, 고칠 곳을 한 번에 모은다
+          echo 'WPEWEBKIT_MAKE_OPTS += -k 0' >> buildroot/package/wpewebkit/wpewebkit.mk
 
       - name: 받은 부품 캐시
         uses: actions/cache/restore@v4
