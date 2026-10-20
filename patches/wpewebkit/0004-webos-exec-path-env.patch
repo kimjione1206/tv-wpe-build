@@ -1,0 +1,21 @@
+webOS TV 앱 안에 엔진을 넣을 수 있게 WEBKIT_EXEC_PATH 를 항상 읽음
+
+--- a/Source/WebKit/Shared/glib/ProcessExecutablePathGLib.cpp
++++ b/Source/WebKit/Shared/glib/ProcessExecutablePathGLib.cpp
+@@ -44,7 +44,7 @@
+ 
+ static String findWebKitProcess(const char* processName)
+ {
+-#if ENABLE(DEVELOPER_MODE)
++    // webOS TV 앱은 엔진을 앱 폴더 안에 넣어 두므로, 개발자 판이 아니어도 WEBKIT_EXEC_PATH 로 보조 프로그램 위치를 받는다
+     static const char* execDirectory = g_getenv("WEBKIT_EXEC_PATH");
+     if (execDirectory) {
+         String processPath = FileSystem::pathByAppendingComponent(FileSystem::stringFromFileSystemRepresentation(execDirectory), StringView::fromLatin1(processName));
+@@ -52,6 +52,7 @@
+             return processPath;
+     }
+ 
++#if ENABLE(DEVELOPER_MODE)
+     static String executablePath = getExecutablePath();
+     if (!executablePath.isNull()) {
+         String processPath = FileSystem::pathByAppendingComponent(executablePath, StringView::fromLatin1(processName));
