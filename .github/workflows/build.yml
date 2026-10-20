@@ -74,6 +74,7 @@ jobs:
         working-directory: buildroot/output/target
         run: |
           tar czf ../../../wpe-target.tar.gz usr/bin/cog* usr/lib usr/libexec usr/share/wpe* usr/share/fonts 2>/dev/null || tar czf ../../../wpe-target.tar.gz usr/bin usr/lib usr/libexec
+          tar czf ../../../wpe-certs.tar.gz etc/ssl 2>/dev/null || true
           ls -lh ../../../wpe-target.tar.gz
           du -sh usr/lib usr/libexec || true
 
@@ -82,6 +83,22 @@ jobs:
         with:
           name: wpe-target
           path: wpe-target.tar.gz
+          retention-days: 7
+
+      - name: 실행기 만들기용 설계도(헤더·라이브러리) 묶기
+        if: success()
+        working-directory: buildroot/output/staging
+        run: |
+          tar czf ../../../wpe-staging.tar.gz usr/include usr/lib/pkgconfig usr/lib/glib-2.0 $(cd . && ls usr/lib/*.so* | grep -v -E 'python|Qt5')
+          ls -lh ../../../wpe-staging.tar.gz
+
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: wpe-staging
+          path: |
+            wpe-staging.tar.gz
+            wpe-certs.tar.gz
           retention-days: 7
 
       - name: 빌드 기록 마지막 부분

@@ -6,3 +6,6 @@ BR2_PACKAGE_COG=y
 # 화면은 SDL(0단계에서 검증)로 따로 연결한다
 # 기본값이 "켬"이라 직접 꺼야 함
 # BR2_PACKAGE_COG_PLATFORM_FDO is not set
+# https(보안 접속): glib 의 TLS 모듈(OpenSSL 방식) + 인증서 묶음
+BR2_PACKAGE_GLIB_NETWORKING=y
+BR2_PACKAGE_CA_CERTIFICATES=y
