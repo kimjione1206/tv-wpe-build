@@ -1,0 +1,14 @@
+webOS TV 에 /dev/random 이 없어 "no entropy gathering module detected" 로 죽음 → /dev/urandom 사용
+
+--- a/configure.ac
++++ b/configure.ac
+@@ -344,7 +344,8 @@
+         ;;
+ esac
+ 
+-NAME_OF_DEV_RANDOM="/dev/random"
++# webOS TV 에는 /dev/random 이 없고 /dev/urandom 만 있어서, 둘 다 urandom 을 쓴다
++NAME_OF_DEV_RANDOM="/dev/urandom"
+ NAME_OF_DEV_URANDOM="/dev/urandom"
+ 
+ AC_ARG_ENABLE(endian-check,
