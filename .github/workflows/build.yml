@@ -89,8 +89,9 @@ jobs:
         if: success()
         working-directory: buildroot/output/staging
         run: |
-          tar czf ../../../wpe-staging.tar.gz usr/include usr/lib/pkgconfig usr/lib/glib-2.0 $(cd . && ls usr/lib/*.so* | grep -v -E 'python|Qt5')
-          ls -lh ../../../wpe-staging.tar.gz
+          # staging 은 sysroot 를 가리키는 바로가기라 ../../.. 이 엉뚱한 곳이 됨 → 절대 경로로 저장
+          tar czf ${GITHUB_WORKSPACE}/wpe-staging.tar.gz usr/include usr/lib/pkgconfig usr/lib/glib-2.0 $(ls usr/lib/*.so* | grep -v -E 'python|Qt5')
+          ls -lh ${GITHUB_WORKSPACE}/wpe-staging.tar.gz
 
       - uses: actions/upload-artifact@v4
         if: success()
