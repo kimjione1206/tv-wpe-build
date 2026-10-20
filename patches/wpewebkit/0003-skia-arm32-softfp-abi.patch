@@ -1,0 +1,15 @@
+Skia: softfp 인 webOS 에서 aapcs-vfp 단계 호출 약속을 쓰지 않음 (그라데이션·그림자 깨짐)
+
+--- a/Source/ThirdParty/skia/src/opts/SkRasterPipeline_opts.h
++++ b/Source/ThirdParty/skia/src/opts/SkRasterPipeline_opts.h
+@@ -1520,7 +1520,9 @@
+ 
+ // Any custom ABI to use for all (non-externally-facing) stage functions?
+ // Also decide here whether to use narrow (compromise) or wide (ideal) stages.
+-#if defined(SK_CPU_ARM32) && defined(SKRP_CPU_NEON)
++// webOS TV 는 softfp(소수를 일반 레지스터로 넘김) 방식이라 aapcs-vfp 약속을 쓰면 값이 엉뚱하게 넘어간다
++// → 하드 플로트(__ARM_PCS_VFP)일 때만 이 특별 약속을 쓴다
++#if defined(SK_CPU_ARM32) && defined(SKRP_CPU_NEON) && defined(__ARM_PCS_VFP)
+     // This lets us pass vectors more efficiently on 32-bit ARM.
+     // We can still only pass 16 floats, so best as 4x {r,g,b,a}.
+     #define ABI __attribute__((pcs("aapcs-vfp")))
